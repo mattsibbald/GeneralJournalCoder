@@ -1,0 +1,26 @@
+# Secrets
+.env
+
+# Virtual environment
+.venv/
+
+# Embedding & fetch cache (large, regenerated automatically)
+.cache/
+
+# Pipeline output (can be large)
+articles_scored.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# macOS
+.DS_Store
+
+# Streamlit
+.streamlit/secrets.toml
