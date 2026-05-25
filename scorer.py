@@ -428,6 +428,20 @@ def score_articles(
                     elif rel == "NOT RELEVANT" and sk in secondary:
                         secondary.remove(sk)
 
+        # 4. Guaranteed-primary fallback ─────────────────────────────────
+        # If nothing cleared threshold_primary (and LLM didn't help), promote
+        # the single best-matching specialty so every article that passed ingest
+        # is visible in at least one feed.
+        fallback_used = False
+        if not primary and top_scores:
+            best_key, best_val = top_scores[0]
+            if best_val >= config.threshold_fallback_primary:
+                primary = [best_key]
+                # Remove from secondary to avoid double-listing
+                if best_key in secondary:
+                    secondary.remove(best_key)
+                fallback_used = True
+
         result = {
             "pmid": article.pmid,
             "doi": article.doi,
@@ -444,6 +458,7 @@ def score_articles(
             "primary_specialties": sorted(set(primary)),
             "secondary_specialties": sorted(set(secondary)),
             "top_score": top_vals[0] if top_vals else 0.0,
+            "fallback_tag": fallback_used,     # True when promoted via floor rule
             "llm_adjudication": llm_result,
         }
         results.append(result)

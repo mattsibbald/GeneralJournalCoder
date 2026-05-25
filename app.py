@@ -322,9 +322,11 @@ with tab_run:
 
         st.divider()
         m1, m2, m3, m4 = st.columns(4)
+        n_fallback = sum(1 for a in scored if a.get("fallback_tag"))
         m1.metric("Total articles", len(scored))
         m2.metric("Tagged (primary)", n_primary)
-        m3.metric("Untagged", n_untagged)
+        m3.metric("Fallback-tagged", n_fallback,
+                  help="Primary tag assigned via floor rule — top specialty promoted when none cleared 0.75")
         m4.metric("Specialties covered",
                   len({s for a in scored for s in a["primary_specialties"]}))
 
@@ -368,9 +370,11 @@ with tab_browse:
         else:
             for art in feed[:50]:  # cap at 50 for performance
                 score   = art.get("feed_score", 0.0)
-                is_prim = chosen_specialty in art["primary_specialties"]
+                is_prim    = chosen_specialty in art["primary_specialties"]
+                is_fallback = art.get("fallback_tag") and is_prim
                 tag_col = SUCCESS_COLOR if is_prim else WARNING_COLOR
-                tag_lbl = "PRIMARY" if is_prim else "secondary"
+                tag_lbl = ("PRIMARY (fallback)" if is_fallback
+                           else "PRIMARY" if is_prim else "secondary")
 
                 # Score bar colour
                 if score >= 0.75:

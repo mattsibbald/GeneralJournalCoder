@@ -109,6 +109,11 @@ class PipelineConfig:
     threshold_secondary:  float = 0.60   # → secondary_specialties[]
     threshold_llm_review: float = 0.65   # Call LLM when score in [0.60, 0.70]
 
+    # Guaranteed-primary floor: if no specialty clears threshold_primary,
+    # the single top-scoring specialty is promoted to primary provided its
+    # score exceeds this value.  Set to 0.0 to always guarantee a tag.
+    threshold_fallback_primary: float = 0.40
+
     # ------------------------------------------------------------------ #
     # Embedding model
     # ------------------------------------------------------------------ #
